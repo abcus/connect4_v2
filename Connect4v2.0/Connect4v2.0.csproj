@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Board.cs" />
+    <Compile Include="Position.cs" />
     <Compile Include="Search.cs" />
     <Compile Include="TTable.cs" />
     <Compile Include="Utilities.cs" />

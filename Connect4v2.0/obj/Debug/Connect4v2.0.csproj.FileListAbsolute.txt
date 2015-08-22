@@ -7,3 +7,6 @@ C:\Users\Kevin\Documents\C# Projects\Connect4v2.0\Connect4v2.0\obj\Debug\Connect
 C:\Users\Kevin\Documents\C# Projects\Connect4v2.0\connect4_v2\Connect4v2.0\bin\Debug\Connect4v2.0.exe.config
 C:\Users\Kevin\Documents\C# Projects\Connect4v2.0\connect4_v2\Connect4v2.0\obj\Debug\Connect4v2.0.exe
 C:\Users\Kevin\Documents\C# Projects\Connect4v2.0\connect4_v2\Connect4v2.0\obj\Debug\Connect4v2.0.pdb
+C:\Users\Kevin\Documents\C# Projects\Connect4v2.0\connect4_v2\Connect4v2.0\bin\Debug\Connect4v2.0.exe
+C:\Users\Kevin\Documents\C# Projects\Connect4v2.0\connect4_v2\Connect4v2.0\bin\Debug\Connect4v2.0.pdb
+C:\Users\Kevin\Documents\C# Projects\Connect4v2.0\connect4_v2\Connect4v2.0\obj\Debug\Connect4v2.0.csprojResolveAssemblyReference.cache

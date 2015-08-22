@@ -21,7 +21,7 @@ namespace Connect4v2._0 {
         public const int EXACT = 1, L_BOUND = 2, U_BOUND = 3;
         public static TTEntry EMPTY_ENTRY = new TTEntry(0,0,0,0);
 
-        public static void DrawBoard(Board inputBoard) {
+        public static void DrawBoard(Position inputBoard) {
             for (int i = 0; i < 6; i++) {
                 if (i == 0) {
                     Console.WriteLine("  ┌───┬───┬───┬───┬───┬───┬───┐");
@@ -68,7 +68,7 @@ namespace Connect4v2._0 {
 
         public static void PerftTest() {
             for (int i = 1; i < 14; i++) {
-                Board test = new Board();
+                Position test = new Position();
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 long nodeCount = Utilities.perft(i, test);
@@ -78,7 +78,7 @@ namespace Connect4v2._0 {
             }   
         }
 
-        public static long perft(int depth, Board inputBoard) {
+        public static long perft(int depth, Position inputBoard) {
             long nodes = 0;
             if (inputBoard.GameStatus() != Utilities.GAMENOTOVER) {
                 return 1;

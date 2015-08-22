@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Connect4v2._0 {
-    class Board {
+    class Position {
 
         internal int nPlies; // keeps track of the number of plies that have been played to get to the current position
         internal UInt64[] arrayOfBitboard; // stores the bitboards for the white and black players and the combined bitboard
@@ -16,7 +16,7 @@ namespace Connect4v2._0 {
         internal UInt64 key = 0x0UL;
 
         // Constructor
-        public Board() {
+        public Position() {
             nPlies = 0;
             arrayOfBitboard = new UInt64[3];
             moveHistory = new int[42];
