@@ -89,13 +89,10 @@ namespace Connect4v2._0 {
         public int GameStatus() {
             if (this.HasWon(this.arrayOfBitboard[(nPlies - 1) & 1])) {
                 return Utilities.WIN;
-            } else {
-                if (this.BoardFull()) {
-                    return Utilities.DRAW;
-                } else {
-                    return Utilities.GAMENOTOVER;
-                }
-            }
+            } else if (this.BoardFull()) {
+                return Utilities.DRAW;
+            } 
+            return Utilities.GAMENOTOVER;
         }
     }
 }

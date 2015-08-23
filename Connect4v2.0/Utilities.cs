@@ -28,7 +28,7 @@ namespace Connect4v2._0 {
                 } else if (i >= 1) {
                     Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┤");
                 }
-                Console.Write((6-i) + " ");
+                Console.Write((char)('F'-i) + " ");
 
                 for (int j = 0; j < 7; j++) {
                     int shiftNumber = 5 - i + (7*j);
@@ -46,7 +46,7 @@ namespace Connect4v2._0 {
                 Console.WriteLine("│");
             }
             Console.WriteLine("  └───┴───┴───┴───┴───┴───┴───┘");
-            Console.WriteLine("    A   B   C   D   E   F   G");
+            Console.WriteLine("    1   2   3   4   5   6   7");
             Console.WriteLine("Key: " + inputBoard.key);
             Console.WriteLine("");
         }

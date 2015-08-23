@@ -22,13 +22,12 @@ namespace Connect4v2._0 {
 
         public TTEntry probeTTable(UInt64 key) {
             Debug.Assert(key != 0);
-            int index = (int) (key%Utilities.TT_SIZE);
+            int index = (int) (key % Utilities.TT_SIZE);
             if (this.hashTable[index].key == key) {
                 return this.hashTable[index];
             }
             return Utilities.EMPTY_ENTRY;
         }
-
     }
 
     internal struct TTEntry {
@@ -46,5 +45,4 @@ namespace Connect4v2._0 {
             this.move = move;
         }
     }
-
 }
