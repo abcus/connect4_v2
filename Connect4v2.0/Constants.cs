@@ -26,7 +26,7 @@ namespace Connect4v2._0 {
         public const int MOVE_MASK = 0x7, SCORE_MASK = 0x7FFF8;
         public const int MOVE_SHIFT = 0, SCORE_SHIFT = 3;
         public const int CENTRAL_COLUMN_SCORE = 40, DISTANCE_PENALTY = 10;
-
+        public static int KILLER_0_SCORE = 10, KILLER_1_SCORE = 8;
 
         public static void DrawBoard(Position inputBoard) {
             for (int i = 0; i < 6; i++) {

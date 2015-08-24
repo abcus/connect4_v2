@@ -49,7 +49,7 @@ namespace Connect4v2._0 {
                 if (move == -1) {
                     break;
                 }
-
+                
                 inputBoard.MakeMove(move);
                 int score = -search(Constants.NON_ROOT, inputBoard, ply + 1, -beta, -alpha, depth - 1);
                 inputBoard.UnmakeMove();
@@ -100,49 +100,56 @@ namespace Connect4v2._0 {
         internal class movePicker {
             internal Position board;
             internal int ply;
-            internal int[,] moveListScore = {{0, 1, 2, 3, 4, 5, 6}, {10, 20, 30, 40, 30, 20, 10}};
+            internal int[] moveList;
             internal int moveIndex = 0;
-
+            internal int numberOfMoves = 0;
 
             public movePicker(Position inputBoard, int ply) {
                 board = inputBoard;
                 this.ply = ply;
-
-                if (Search.killerTable[ply, 0] != -1) {
-                    moveListScore[1, Search.killerTable[ply, 0]] += 5;
-                }
-                if (Search.killerTable[ply, 1] != -1) {
-                    moveListScore[1, Search.killerTable[ply, 1]] += 4;
-                }   
+                moveList = this.moveGenerator();
             }
-            
+            // generates array of moves
+            internal int[] moveGenerator() {
+                int[] moveList = { -1, -1, -1, -1, -1, -1, -1 };
+                
+                for (int i = 0; i < 7; i++) {
+                    if (board.ColPlayable(i)) {
+                        int score = (Constants.CENTRAL_COLUMN_SCORE - Constants.DISTANCE_PENALTY*Math.Abs(i - 3));
+                        if (i == Search.killerTable[ply, 0]) {
+                            score += Constants.KILLER_0_SCORE;
+                        } else if (i == Search.killerTable[ply, 1]) {
+                            score += Constants.KILLER_1_SCORE;
+                        }
+
+                        moveList[numberOfMoves] = i | score << Constants.SCORE_SHIFT;
+                        numberOfMoves++;
+                    }
+                }
+                return moveList;
+            }
 
             internal int getNextMove() {
-                while (moveIndex < 7) {
+                while (moveIndex < numberOfMoves) {
 
                     int maxScore = -999;
                     int maxPosition = -1;
-                    for (int i = moveIndex; i < 7; i++) {
-                        if (moveListScore[1, i] > maxScore) {
-                            maxScore = moveListScore[1, i];
+                    for (int i = moveIndex; i < numberOfMoves; i++) {
+                        
+                        if (((moveList[i] & Constants.SCORE_MASK) >> Constants.SCORE_SHIFT) > maxScore) {
+                            maxScore = ((moveList[i] & Constants.SCORE_MASK) >> Constants.SCORE_SHIFT);
                             maxPosition = i;
                         }
                     }
-                    int moveTemp = moveListScore[0, moveIndex];
-                    moveListScore[0, moveIndex] = moveListScore[0, maxPosition];
-                    moveListScore[0, maxPosition] = moveTemp;
+                    int moveTemp = moveList[moveIndex];
+                    moveList[moveIndex] = moveList[maxPosition];
+                    moveList[maxPosition] = moveTemp;
 
-                    int scoreTemp = moveListScore[1, moveIndex];
-                    moveListScore[1, moveIndex] = moveListScore[1, maxPosition];
-                    moveListScore[1, maxPosition] = scoreTemp;
-
-                    int move = moveListScore[0, moveIndex];
+                    int move = (moveList[moveIndex] & Constants.MOVE_MASK);
                     
-                    if (board.ColPlayable(move)) {
-                        moveIndex++;
-                        return move;   
-                    }
+                    
                     moveIndex++;
+                    return move;   
                 }
                 return -1;
             }

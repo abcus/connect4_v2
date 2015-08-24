@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -56,19 +57,6 @@ namespace Connect4v2._0 {
         // return whether a stone can be dropped into a column
         public bool ColPlayable(int col) {
             return height[col] - 7 * col <= 5;
-        }
-        // generates array of moves
-        public int[] moveGenerator() {
-            int[] moveList = {-1, -1, -1, -1, -1, -1, -1, -1};
-            int index = 0;
-
-            for (int i = 0; i < 7; i++) {
-                if (this.ColPlayable(i)) {
-                    moveList[index] = i | ((Constants.CENTRAL_COLUMN_SCORE - Constants.DISTANCE_PENALTY * Math.Abs(i - 3))<< Constants.SCORE_SHIFT);
-                    index ++;
-                }
-            }
-            return moveList;
         }
 
         // returns whether the game board's 42 squares are full
