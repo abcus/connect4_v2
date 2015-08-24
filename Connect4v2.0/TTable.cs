@@ -9,24 +9,54 @@ using System.Threading.Tasks;
 namespace Connect4v2._0 {
     class TTable {
 
-        internal TTEntry[] hashTable;
+        internal TTEntry[] transpositionTable;
 
+        // Constructor
         public TTable() {
-            this.hashTable = new TTEntry[Utilities.TT_SIZE + Utilities.BUCKET_SIZE];
+            this.transpositionTable = new TTEntry[Constants.TT_SIZE + Constants.BUCKET_SIZE];
         }
 
+        // Store entry into TTable
         public void storeTTable(UInt64 key, TTEntry entry) {
-            int index = (int) (key%Utilities.TT_SIZE);
-            this.hashTable[index] = entry;
+            int index = (int) (key % Constants.TT_SIZE);
+
+            // If entry in bucket has same hash key, then replace
+            for (int i = index; i < index + Constants.BUCKET_SIZE; i++) {
+                if (this.transpositionTable[i].key == key) {
+                    this.transpositionTable[i] = entry;
+                    return;
+                }
+            }
+            // If there is an empty spot in the bucket, then store it there
+            for (int i = index; i < index + Constants.BUCKET_SIZE; i++) {
+                if (this.transpositionTable[i].key == 0) {
+                    this.transpositionTable[i] = entry;
+                    return;
+                }
+            }
+            // If all spots full, then replace entry with lowest depth
+            int shallowestDepth = Constants.INF;
+            int indexOfShallowestEntry = -1;
+            for (int i = index; i < index + Constants.BUCKET_SIZE; i++) {
+                if (this.transpositionTable[i].depth < shallowestDepth) {
+                    shallowestDepth = this.transpositionTable[i].depth;
+                    indexOfShallowestEntry = i;
+                }
+            }
+            this.transpositionTable[indexOfShallowestEntry] = entry;
         }
 
+        // Retrieve entry from TTable
         public TTEntry probeTTable(UInt64 key) {
             Debug.Assert(key != 0);
-            int index = (int) (key % Utilities.TT_SIZE);
-            if (this.hashTable[index].key == key) {
-                return this.hashTable[index];
+            int index = (int) (key % Constants.TT_SIZE);
+
+            for (int i = index; i < index + Constants.BUCKET_SIZE; i++) {
+                if (this.transpositionTable[i].key == key) {
+                    return this.transpositionTable[i];
+                }
             }
-            return Utilities.EMPTY_ENTRY;
+            return Constants.EMPTY_ENTRY;
         }
     }
 

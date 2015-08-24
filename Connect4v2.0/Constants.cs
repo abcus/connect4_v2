@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Connect4v2._0 {
-    static class Utilities {
+    static class Constants {
 
         public const int WIDTH = 7, HEIGHT = 6, H1 = 7, H2 = 8, SIZE = 42, SIZE1 = 49;
         public const UInt64 ALL1 = 0x1FFFFFFFFFFFF, COL1 = 0x7F, BOTTOM = 0x40810204081, TOP = 0x1020408102040, ALL = ALL1 ^ TOP;
@@ -19,7 +19,14 @@ namespace Connect4v2._0 {
         public static Random rnd = new Random(0);
         public const int TT_SIZE = 15485867, BUCKET_SIZE = 4;
         public const int EXACT = 1, L_BOUND = 2, U_BOUND = 3;
+        public const int ROOT = 1, NON_ROOT = 2;
         public static TTEntry EMPTY_ENTRY = new TTEntry(0,0,0,0);
+        public static int[,] moveList = {{0, 1, 2, 3, 4, 5, 6}, {10, 20, 30, 40, 30, 20, 10}};
+        public const int PHASE_KILLER_0 = 0, PHASE_KILLER_1 = 1, PHASE_REST = 2;
+        public const int MOVE_MASK = 0x7, SCORE_MASK = 0x7FFF8;
+        public const int MOVE_SHIFT = 0, SCORE_SHIFT = 3;
+        public const int CENTRAL_COLUMN_SCORE = 40, DISTANCE_PENALTY = 10;
+
 
         public static void DrawBoard(Position inputBoard) {
             for (int i = 0; i < 6; i++) {
@@ -61,7 +68,12 @@ namespace Connect4v2._0 {
         public static void initSearchConstants() {
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 49; j++) {
-                    Utilities.pieceZobrist[i, j] = rnd.NextUInt64();
+                    Constants.pieceZobrist[i, j] = rnd.NextUInt64();
+                }
+            }
+            for (int i = 0; i < Constants.MAX_DEPTH; i++) {
+                for (int j = 0; j < 2; j++) {
+                    Search.killerTable[i, j] = -1;
                 }
             }
         }
@@ -71,7 +83,7 @@ namespace Connect4v2._0 {
                 Position test = new Position();
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                long nodeCount = Utilities.perft(i, test);
+                long nodeCount = Constants.perft(i, test);
                 Console.Write(i + "\t\t" + nodeCount + "\t\t");
                 stopwatch.Stop();
                 Console.WriteLine(stopwatch.ElapsedMilliseconds + "\t\t" + nodeCount/(stopwatch.ElapsedMilliseconds+1)*1000);
@@ -80,7 +92,7 @@ namespace Connect4v2._0 {
 
         public static long perft(int depth, Position inputBoard) {
             long nodes = 0;
-            if (inputBoard.GameStatus() != Utilities.GAMENOTOVER) {
+            if (inputBoard.GameStatus() != Constants.GAMENOTOVER) {
                 return 1;
             } else if (depth == 1) {
                 for (int i = 0; i < 7; i++) {

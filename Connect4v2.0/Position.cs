@@ -13,7 +13,7 @@ namespace Connect4v2._0 {
         internal UInt64[] arrayOfBitboard; // stores the bitboards for the white and black players and the combined bitboard
         internal int[] moveHistory; // stores the history of the moves (represented by what column 0-7 the move was played in)
         internal int[] height; // stores the index of the lowest unoccupied square in each column
-        internal UInt64 key = 0x0UL;
+        internal UInt64 key = 0x1UL;
 
         // Constructor
         public Position() {
@@ -37,7 +37,7 @@ namespace Connect4v2._0 {
             moveHistory[nPlies] = moveColumn;
             arrayOfBitboard[nPlies & 1] ^= 0x1UL << height[moveColumn];
             arrayOfBitboard[2] ^= 0x1UL << height[moveColumn];
-            key ^= Utilities.pieceZobrist[nPlies&1, height[moveColumn]];
+            key ^= Constants.pieceZobrist[nPlies & 1, height[moveColumn]];
             height[moveColumn]++;
             nPlies++;
         }
@@ -47,7 +47,7 @@ namespace Connect4v2._0 {
             nPlies--;
             int lastMove = moveHistory[nPlies];
             height[lastMove]--;
-            key ^= Utilities.pieceZobrist[nPlies & 1, height[lastMove]];
+            key ^= Constants.pieceZobrist[nPlies & 1, height[lastMove]];
             arrayOfBitboard[nPlies & 1] ^= 0x1UL << height[lastMove];
             arrayOfBitboard[2] ^= 0x1UL << height[lastMove];
             moveHistory[nPlies] = 0;
@@ -55,29 +55,42 @@ namespace Connect4v2._0 {
 
         // return whether a stone can be dropped into a column
         public bool ColPlayable(int col) {
-            return height[col] - 7*col <= 5;
+            return height[col] - 7 * col <= 5;
+        }
+        // generates array of moves
+        public int[] moveGenerator() {
+            int[] moveList = {-1, -1, -1, -1, -1, -1, -1, -1};
+            int index = 0;
+
+            for (int i = 0; i < 7; i++) {
+                if (this.ColPlayable(i)) {
+                    moveList[index] = i | ((Constants.CENTRAL_COLUMN_SCORE - Constants.DISTANCE_PENALTY * Math.Abs(i - 3))<< Constants.SCORE_SHIFT);
+                    index ++;
+                }
+            }
+            return moveList;
         }
 
         // returns whether the game board's 42 squares are full
         public bool BoardFull() {
-            return arrayOfBitboard[2] == Utilities.ALL; // array of bitboard[2] is the bitboard of white | black
+            return arrayOfBitboard[2] == Constants.ALL; // array of bitboard[2] is the bitboard of white | black
         }
 
         // returns whether there is a 4-in-a-row
         public bool HasWon(UInt64 inputBoard) {
             // checks diagonal \
-            UInt64 temp = inputBoard & (inputBoard >> Utilities.HEIGHT);
-            if ((temp & (temp >> 2*Utilities.HEIGHT)) != 0) {
+            UInt64 temp = inputBoard & (inputBoard >> Constants.HEIGHT);
+            if ((temp & (temp >> 2 * Constants.HEIGHT)) != 0) {
                 return true;
             }
             // checks horizontal -
-            temp = inputBoard & (inputBoard >> Utilities.H1);
-            if ((temp & (temp >> 2*Utilities.H1)) != 0) {
+            temp = inputBoard & (inputBoard >> Constants.H1);
+            if ((temp & (temp >> 2 * Constants.H1)) != 0) {
                 return true;
             }
             //checks diagonal /
-            temp = inputBoard & (inputBoard >> Utilities.H2);
-            if ((temp & (temp >> 2*Utilities.H2)) != 0) {
+            temp = inputBoard & (inputBoard >> Constants.H2);
+            if ((temp & (temp >> 2 * Constants.H2)) != 0) {
                 return true;
             }
             // checks vertical |
@@ -88,11 +101,11 @@ namespace Connect4v2._0 {
         // returns whether game is won, drawn, or not over
         public int GameStatus() {
             if (this.HasWon(this.arrayOfBitboard[(nPlies - 1) & 1])) {
-                return Utilities.WIN;
+                return Constants.WIN;
             } else if (this.BoardFull()) {
-                return Utilities.DRAW;
+                return Constants.DRAW;
             } 
-            return Utilities.GAMENOTOVER;
+            return Constants.GAMENOTOVER;
         }
     }
 }
