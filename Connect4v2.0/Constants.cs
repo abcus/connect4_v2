@@ -21,22 +21,18 @@ namespace Connect4v2._0 {
         public const int EXACT = 1, L_BOUND = 2, U_BOUND = 3;
         public const int ROOT = 1, NON_ROOT = 2;
         public static TTEntry EMPTY_ENTRY = new TTEntry(0,0,0,0);
-        public static int[,] moveList = {{0, 1, 2, 3, 4, 5, 6}, {10, 20, 30, 40, 30, 20, 10}};
         public const int PHASE_KILLER_0 = 0, PHASE_KILLER_1 = 1, PHASE_REST = 2;
-        public const int MOVE_MASK = 0x7, SCORE_MASK = 0x7FFF8;
-        public const int MOVE_SHIFT = 0, SCORE_SHIFT = 3;
         public const int CENTRAL_COLUMN_SCORE = 40, DISTANCE_PENALTY = 10;
-        public static int KILLER_0_SCORE = 10, KILLER_1_SCORE = 8;
+        public static int KILLER_0_SCORE = 10, KILLER_1_SCORE = 8, HASH_MOVE_SCORE = 50;
 
         public static void DrawBoard(Position inputBoard) {
             for (int i = 0; i < 6; i++) {
                 if (i == 0) {
-                    Console.WriteLine("  ┌───┬───┬───┬───┬───┬───┬───┐");
+                    Console.WriteLine("┌───┬───┬───┬───┬───┬───┬───┐");
                 } else if (i >= 1) {
-                    Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┤");
+                    Console.WriteLine("├───┼───┼───┼───┼───┼───┼───┤");
                 }
-                Console.Write((char)('F'-i) + " ");
-
+                
                 for (int j = 0; j < 7; j++) {
                     int shiftNumber = 5 - i + (7*j);
                     String piece;
@@ -52,8 +48,8 @@ namespace Connect4v2._0 {
                 }
                 Console.WriteLine("│");
             }
-            Console.WriteLine("  └───┴───┴───┴───┴───┴───┴───┘");
-            Console.WriteLine("    1   2   3   4   5   6   7");
+            Console.WriteLine("└───┴───┴───┴───┴───┴───┴───┘");
+            Console.WriteLine("  1   2   3   4   5   6   7");
             Console.WriteLine("Key: " + inputBoard.key);
             Console.WriteLine("");
         }

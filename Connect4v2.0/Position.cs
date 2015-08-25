@@ -96,4 +96,14 @@ namespace Connect4v2._0 {
             return Constants.GAMENOTOVER;
         }
     }
+
+    internal struct Move {
+        internal int move;
+        internal int score;
+
+        public Move(int move, int score) {
+            this.move = move;
+            this.score = score;
+        }
+    }
 }
