@@ -68,9 +68,9 @@ namespace Connect4v2._0 {
                 movesMade++;
 
                 if (score >= beta) {
-                    TTEntry newEntry = new TTEntry(inputBoard.key, Constants.L_BOUND, depth, score, move);
+                    TTEntry newEntry = new TTEntry(inputBoard.key, Constants.L_BOUND, depth, score, inputBoard.height[move]);
                     Search.TranspositionTable.storeTTable(inputBoard.key, newEntry);
-                    updateKillers(move, ply);
+                    updateKillers(inputBoard.height[move], ply);
                     //updateHistory(moveHistory, ply, movesMade);
 
                     if (movesMade == 1) {
@@ -93,7 +93,7 @@ namespace Connect4v2._0 {
             }
             // Store in transposition table
             if (raisedAlpha) {
-                TTEntry newEntry = new TTEntry(inputBoard.key, Constants.EXACT, depth, alpha, bestMove);
+                TTEntry newEntry = new TTEntry(inputBoard.key, Constants.EXACT, depth, alpha, inputBoard.height[bestMove]);
                 Search.TranspositionTable.storeTTable(inputBoard.key, newEntry);
             } else {
                 TTEntry newEntry = new TTEntry(inputBoard.key, Constants.U_BOUND, depth, bestScore, Constants.NO_MOVE); // no best move
@@ -103,7 +103,7 @@ namespace Connect4v2._0 {
         }
 
         internal static void updateKillers(int move, int ply) {
-            Debug.Assert(move >= 0 && move <= 6);
+            Debug.Assert(move >= 0 && move <= 47);
             if (move != Search.killerTable[ply, 0] && move != Constants.NO_MOVE) {
                 Search.killerTable[ply, 1] = Search.killerTable[ply, 0];
                 Search.killerTable[ply, 0] = move;
@@ -139,12 +139,12 @@ namespace Connect4v2._0 {
                 for (int i = 0; i < 7; i++) {
                     if (board.height[i] - 7 * i <= 5) {
                         int score = (Constants.CENTRAL_COLUMN_SCORE - Constants.DISTANCE_PENALTY*Math.Abs(i - 3));
-                        if (hashMove != Constants.NO_MOVE && i == hashMove) {
+                        if (hashMove != Constants.NO_MOVE && board.height[i] == hashMove) {
                             score += Constants.HASH_MOVE_SCORE;
                         } 
-                        if (i == Search.killerTable[ply, 0]) {
+                        if (board.height[i] == Search.killerTable[ply, 0]) {
                             score += Constants.KILLER_0_SCORE;
-                        } else if (i == Search.killerTable[ply, 1]) {
+                        } else if (board.height[i] == Search.killerTable[ply, 1]) {
                             score += Constants.KILLER_1_SCORE;
                         }
                         //score += Search.historyTable[ply & 1, i];
