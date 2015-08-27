@@ -13,7 +13,7 @@ namespace Connect4v2._0 {
 
         public const int WIDTH = 7, HEIGHT = 6, H1 = 7, H2 = 8, SIZE = 42, SIZE1 = 49;
         public const UInt64 ALL1 = 0x1FFFFFFFFFFFF, COL1 = 0x7F, BOTTOM = 0x40810204081, TOP = 0x1020408102040, ALL = ALL1 ^ TOP;
-        public const int WIN = 100, DRAW = 0, GAMENOTOVER = -1;
+        public const int WIN = 100, DRAW = 0;
         public const int MAX_DEPTH = 42, INF = 999999999;
         public static UInt64[,] pieceZobrist = new UInt64[2, 49];
         public static Random rnd = new Random(0);
@@ -74,7 +74,7 @@ namespace Connect4v2._0 {
                 }
             }
         }
-
+        /*
         public static void PerftTest() {
             for (int i = 1; i < 14; i++) {
                 Position test = new Position();
@@ -107,6 +107,6 @@ namespace Connect4v2._0 {
                 }
             }
             return nodes;
-        }
+        }*/
     }
 }

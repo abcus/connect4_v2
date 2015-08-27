@@ -68,9 +68,9 @@ namespace Connect4v2._0 {
                 movesMade++;
 
                 if (score >= beta) {
-                    TTEntry newEntry = new TTEntry(inputBoard.key, Constants.L_BOUND, depth, score, inputBoard.height[move]);
+                    TTEntry newEntry = new TTEntry(inputBoard.key, Constants.L_BOUND, depth, score, move);
                     Search.TranspositionTable.storeTTable(inputBoard.key, newEntry);
-                    updateKillers(inputBoard.height[move], ply);
+                    updateKillers(move, ply);
                     //updateHistory(moveHistory, ply, movesMade);
 
                     if (movesMade == 1) {
@@ -93,7 +93,7 @@ namespace Connect4v2._0 {
             }
             // Store in transposition table
             if (raisedAlpha) {
-                TTEntry newEntry = new TTEntry(inputBoard.key, Constants.EXACT, depth, alpha, inputBoard.height[bestMove]);
+                TTEntry newEntry = new TTEntry(inputBoard.key, Constants.EXACT, depth, alpha, bestMove);
                 Search.TranspositionTable.storeTTable(inputBoard.key, newEntry);
             } else {
                 TTEntry newEntry = new TTEntry(inputBoard.key, Constants.U_BOUND, depth, bestScore, Constants.NO_MOVE); // no best move
@@ -137,19 +137,20 @@ namespace Connect4v2._0 {
                 Move[] moveList = new Move[7];
                 
                 for (int i = 0; i < 7; i++) {
-                    if (board.height[i] - 7 * i <= 5) {
+                    int lowestFreeInCol = board.height[i];
+                    if (lowestFreeInCol - 7 * i <= 5) {
                         int score = (Constants.CENTRAL_COLUMN_SCORE - Constants.DISTANCE_PENALTY*Math.Abs(i - 3));
-                        if (hashMove != Constants.NO_MOVE && board.height[i] == hashMove) {
+                        if (hashMove != Constants.NO_MOVE && lowestFreeInCol == hashMove) {
                             score += Constants.HASH_MOVE_SCORE;
                         } 
-                        if (board.height[i] == Search.killerTable[ply, 0]) {
+                        if (lowestFreeInCol == Search.killerTable[ply, 0]) {
                             score += Constants.KILLER_0_SCORE;
-                        } else if (board.height[i] == Search.killerTable[ply, 1]) {
+                        } else if (lowestFreeInCol == Search.killerTable[ply, 1]) {
                             score += Constants.KILLER_1_SCORE;
                         }
                         //score += Search.historyTable[ply & 1, i];
 
-                        moveList[numberOfMoves] = new Move(board.height[i], score);
+                        moveList[numberOfMoves] = new Move(lowestFreeInCol, score);
                         numberOfMoves++;
                     }
                 }
@@ -175,7 +176,7 @@ namespace Connect4v2._0 {
                     int move = (moveList[moveIndex].move);
                     
                     moveIndex++;
-                    return move/7;   
+                    return move;   
                 }
                 return Constants.NO_MOVE;
             }

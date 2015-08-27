@@ -19,7 +19,7 @@ namespace Connect4v2._0 {
         // Constructor
         public Position() {
             nPlies = 0;
-            arrayOfBitboard = new UInt64[3];
+            arrayOfBitboard = new UInt64[2];
             moveHistory = new int[42];
             height = new int[7];
             for (int i = 0; i < 7; i++) {
@@ -28,18 +28,17 @@ namespace Connect4v2._0 {
             String inputString = Console.ReadLine();
             if (inputString != "") {
                 foreach (char c in inputString) {
-                    this.MakeMove(c - '1');
+                    this.MakeMove(this.height[c - '1']);
                 }
             }
         }
 
-        // make move (input is the column that the stone is being dropped into)
-        public void MakeMove(int moveColumn) {
-            moveHistory[nPlies] = moveColumn;
-            arrayOfBitboard[nPlies & 1] ^= 0x1UL << height[moveColumn];
-            arrayOfBitboard[2] ^= 0x1UL << height[moveColumn];
-            key ^= Constants.pieceZobrist[nPlies & 1, height[moveColumn]];
-            height[moveColumn]++;
+        // make move (input is square index that piece ends up in)
+        public void MakeMove(int move) {
+            moveHistory[nPlies] = move;
+            arrayOfBitboard[nPlies & 1] ^= 0x1UL << move;
+            key ^= Constants.pieceZobrist[nPlies & 1, move];
+            height[move/7]++;
             nPlies++;
         }
 
@@ -47,21 +46,15 @@ namespace Connect4v2._0 {
         public void UnmakeMove() {
             nPlies--;
             int lastMove = moveHistory[nPlies];
-            height[lastMove]--;
-            key ^= Constants.pieceZobrist[nPlies & 1, height[lastMove]];
-            arrayOfBitboard[nPlies & 1] ^= 0x1UL << height[lastMove];
-            arrayOfBitboard[2] ^= 0x1UL << height[lastMove];
+            height[lastMove/7]--;
+            key ^= Constants.pieceZobrist[nPlies & 1, lastMove];
+            arrayOfBitboard[nPlies & 1] ^= 0x1UL << lastMove;
             moveHistory[nPlies] = 0;
-        }
-
-        // return whether a stone can be dropped into a column
-        public bool ColPlayable(int col) {
-            return height[col] - 7 * col <= 5;
         }
 
         // returns whether the game board's 42 squares are full
         public bool BoardFull() {
-            return arrayOfBitboard[2] == Constants.ALL; // array of bitboard[2] is the bitboard of white | black
+            return nPlies == 42; 
         }
 
         // returns whether there is a 4-in-a-row
@@ -84,16 +77,6 @@ namespace Connect4v2._0 {
             // checks vertical |
             temp = inputBoard & (inputBoard >> 1);
             return (temp & (temp >> 2)) != 0;
-        }
-
-        // returns whether game is won, drawn, or not over
-        public int GameStatus() {
-            if (this.HasWon(this.arrayOfBitboard[(nPlies - 1) & 1])) {
-                return Constants.WIN;
-            } else if (this.BoardFull()) {
-                return Constants.DRAW;
-            } 
-            return Constants.GAMENOTOVER;
         }
     }
 
