@@ -14,7 +14,7 @@ namespace Connect4v2._0 {
         public const int WIDTH = 7, HEIGHT = 6, H1 = 7, H2 = 8, SIZE = 42, SIZE1 = 49;
         public const UInt64 ALL1 = 0x1FFFFFFFFFFFF, COL1 = 0x7F, BOTTOM = 0x40810204081, TOP = 0x1020408102040, ALL = ALL1 ^ TOP;
         public const int WIN = 100, DRAW = 0, GAMENOTOVER = -1;
-        public const int MAX_DEPTH = 42, INF = 10000;
+        public const int MAX_DEPTH = 42, INF = 999999999;
         public static UInt64[,] pieceZobrist = new UInt64[2, 49];
         public static Random rnd = new Random(0);
         public const int TT_SIZE = 15485867, BUCKET_SIZE = 4;
@@ -24,6 +24,7 @@ namespace Connect4v2._0 {
         public const int PHASE_KILLER_0 = 0, PHASE_KILLER_1 = 1, PHASE_REST = 2;
         public const int CENTRAL_COLUMN_SCORE = 40, DISTANCE_PENALTY = 10;
         public static int KILLER_0_SCORE = 10, KILLER_1_SCORE = 8, HASH_MOVE_SCORE = 50;
+        public const int NO_MOVE = -1;
 
         public static void DrawBoard(Position inputBoard) {
             for (int i = 0; i < 6; i++) {

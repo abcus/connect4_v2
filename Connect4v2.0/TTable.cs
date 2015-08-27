@@ -67,7 +67,7 @@ namespace Connect4v2._0 {
         internal int evaluationScore;
         internal int move;
 
-        public TTEntry(UInt64 key, int flag, int depth, int evaluationScore, int move = -1) {
+        public TTEntry(UInt64 key, int flag, int depth, int evaluationScore, int move = Constants.NO_MOVE) {
             this.key = key;
             this.flag = flag;
             this.depth = depth;

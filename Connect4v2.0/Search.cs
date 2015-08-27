@@ -11,7 +11,7 @@ namespace Connect4v2._0 {
 
         internal static TTable TranspositionTable = new TTable();
         internal static UInt64 nodesVisited = 0;
-        internal static int PVMove = -1;
+        internal static int PVMove = Constants.NO_MOVE;
         internal static double fh1 = 0, fh = 0;
         internal static int[,] killerTable = new int[Constants.MAX_DEPTH, 2];
         //internal static int[,] historyTable = new int[2, 7];
@@ -37,26 +37,26 @@ namespace Connect4v2._0 {
 
                 // Only exact and lower bound entries can satisfy this condition and they all have valid moves stored, so don't have to check if move == -1 (only the case with upper bound entries)
                 if (entry.evaluationScore >= beta) { 
-                    Debug.Assert(entry.move != -1);
+                    Debug.Assert(entry.move != Constants.NO_MOVE);
                     updateKillers(entry.move, ply);
                 }
                 return entry.evaluationScore;
             }
             
             // hash move, if entry is exact then code will not be reached and if entry is an upper bound then it will have no move
-            int hashMove = (entry.flag == Constants.L_BOUND && entry.evaluationScore < beta) ? entry.move : -1;
+            int hashMove = (entry.flag == Constants.L_BOUND && entry.evaluationScore < beta) ? entry.move : Constants.NO_MOVE;
             int bestScore = -Constants.INF;
             int movesMade = 0;
             bool raisedAlpha = false;
             //int[] moveHistory = {-1, -1, -1, -1, -1, -1, -1};
             movePicker mPicker = new movePicker(inputBoard, ply, hashMove);
-            int bestMove = -1;
+            int bestMove = Constants.NO_MOVE;
 
             // loop through all moves
             while (true) {
                 int move = mPicker.getNextMove();
                 
-                if (move == -1) {
+                if (move == Constants.NO_MOVE) {
                     break;
                 }
                 
@@ -96,7 +96,7 @@ namespace Connect4v2._0 {
                 TTEntry newEntry = new TTEntry(inputBoard.key, Constants.EXACT, depth, alpha, bestMove);
                 Search.TranspositionTable.storeTTable(inputBoard.key, newEntry);
             } else {
-                TTEntry newEntry = new TTEntry(inputBoard.key, Constants.U_BOUND, depth, bestScore, -1); // no best move
+                TTEntry newEntry = new TTEntry(inputBoard.key, Constants.U_BOUND, depth, bestScore, Constants.NO_MOVE); // no best move
                 Search.TranspositionTable.storeTTable(inputBoard.key, newEntry);
             }
             return bestScore;
@@ -104,7 +104,7 @@ namespace Connect4v2._0 {
 
         internal static void updateKillers(int move, int ply) {
             Debug.Assert(move >= 0 && move <= 6);
-            if (move != Search.killerTable[ply, 0] && move != -1) {
+            if (move != Search.killerTable[ply, 0] && move != Constants.NO_MOVE) {
                 Search.killerTable[ply, 1] = Search.killerTable[ply, 0];
                 Search.killerTable[ply, 0] = move;
             }
@@ -124,7 +124,7 @@ namespace Connect4v2._0 {
             internal Move[] moveList;
             internal int moveIndex = 0;
             internal int numberOfMoves = 0;
-            internal int hashMove = -1;
+            internal int hashMove = Constants.NO_MOVE;
 
             public movePicker(Position inputBoard, int ply, int hashMove) {
                 board = inputBoard;
@@ -137,9 +137,9 @@ namespace Connect4v2._0 {
                 Move[] moveList = new Move[7];
                 
                 for (int i = 0; i < 7; i++) {
-                    if (board.ColPlayable(i)) {
+                    if (board.height[i] - 7 * i <= 5) {
                         int score = (Constants.CENTRAL_COLUMN_SCORE - Constants.DISTANCE_PENALTY*Math.Abs(i - 3));
-                        if (hashMove != -1 && i == hashMove) {
+                        if (hashMove != Constants.NO_MOVE && i == hashMove) {
                             score += Constants.HASH_MOVE_SCORE;
                         } 
                         if (i == Search.killerTable[ply, 0]) {
@@ -149,7 +149,7 @@ namespace Connect4v2._0 {
                         }
                         //score += Search.historyTable[ply & 1, i];
 
-                        moveList[numberOfMoves] = new Move(i, score);
+                        moveList[numberOfMoves] = new Move(board.height[i], score);
                         numberOfMoves++;
                     }
                 }
@@ -159,7 +159,7 @@ namespace Connect4v2._0 {
             internal int getNextMove() {
                 while (moveIndex < numberOfMoves) {
 
-                    int maxScore = -999999999;
+                    int maxScore = -Constants.INF;
                     int maxPosition = -1;
                     for (int i = moveIndex; i < numberOfMoves; i++) {
                         
@@ -175,9 +175,9 @@ namespace Connect4v2._0 {
                     int move = (moveList[moveIndex].move);
                     
                     moveIndex++;
-                    return move;   
+                    return move/7;   
                 }
-                return -1;
+                return Constants.NO_MOVE;
             }
         }
     }
