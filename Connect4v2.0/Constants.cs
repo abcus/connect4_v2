@@ -21,9 +21,8 @@ namespace Connect4v2._0 {
         public const int EXACT = 1, L_BOUND = 2, U_BOUND = 3;
         public const int ROOT = 1, NON_ROOT = 2;
         public static TTEntry EMPTY_ENTRY = new TTEntry(0,0,0,0);
-        public const int PHASE_KILLER_0 = 0, PHASE_KILLER_1 = 1, PHASE_REST = 2;
-        public const int CENTRAL_COLUMN_SCORE = 40, DISTANCE_PENALTY = 10;
-        public static int KILLER_0_SCORE = 10, KILLER_1_SCORE = 8, HASH_MOVE_SCORE = 50;
+        public const int CENTRAL_COLUMN_SCORE = 400000000, DISTANCE_PENALTY = 100000000;
+        public static int KILLER_0_SCORE = 100000000, KILLER_1_SCORE = 80000000, HASH_MOVE_SCORE = 500000000;
         public const int NO_MOVE = -1;
 
         public static void DrawBoard(Position inputBoard) {

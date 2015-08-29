@@ -14,11 +14,11 @@ namespace Connect4v2._0 {
         internal static int PVMove = Constants.NO_MOVE;
         internal static double fh1 = 0, fh = 0;
         internal static int[,] killerTable = new int[Constants.MAX_DEPTH, 2];
-        //internal static int[,] historyTable = new int[2, 7];
+        internal static int[,] historyTable = new int[2, 49];
        
         public static int search(int nodeType, Position inputBoard, int ply, int alpha, int beta, int depth) {
             
-            // base case when player has won or nobody has won and board is full
+            // return score for terminal state
             if (inputBoard.HasWon(inputBoard.arrayOfBitboard[(inputBoard.nPlies - 1) & 1])) {
                 return -Constants.WIN + ply;
             } else if (inputBoard.BoardFull()) {
@@ -48,7 +48,6 @@ namespace Connect4v2._0 {
             int bestScore = -Constants.INF;
             int movesMade = 0;
             bool raisedAlpha = false;
-            //int[] moveHistory = {-1, -1, -1, -1, -1, -1, -1};
             movePicker mPicker = new movePicker(inputBoard, ply, hashMove);
             int bestMove = Constants.NO_MOVE;
 
@@ -63,7 +62,6 @@ namespace Connect4v2._0 {
                 inputBoard.MakeMove(move);
                 int score = -search(Constants.NON_ROOT, inputBoard, ply + 1, -beta, -alpha, depth - 1);
                 inputBoard.UnmakeMove();
-                //moveHistory[movesMade] = move;
                 nodesVisited++;
                 movesMade++;
 
@@ -71,7 +69,7 @@ namespace Connect4v2._0 {
                     TTEntry newEntry = new TTEntry(inputBoard.key, Constants.L_BOUND, depth, score, move);
                     Search.TranspositionTable.storeTTable(inputBoard.key, newEntry);
                     updateKillers(move, ply);
-                    //updateHistory(moveHistory, ply, movesMade);
+                    updateHistory(depth, ply, move);
 
                     if (movesMade == 1) {
                         fh1++;
@@ -102,6 +100,7 @@ namespace Connect4v2._0 {
             return bestScore;
         }
 
+        // update the killer table
         internal static void updateKillers(int move, int ply) {
             Debug.Assert(move >= 0 && move <= 47);
             if (move != Search.killerTable[ply, 0] && move != Constants.NO_MOVE) {
@@ -110,13 +109,15 @@ namespace Connect4v2._0 {
             }
         }
 
-        /*internal static void updateHistory(int[] moveHistory , int ply, int movesMade) {
-            int movesMadeBeforeCutoff = movesMade - 1;
-            Search.historyTable[(ply & 1), moveHistory[movesMadeBeforeCutoff]] += movesMadeBeforeCutoff;
-            for (int i = 0; i < movesMadeBeforeCutoff; i++) {
-                Search.historyTable[(ply & 1), moveHistory[i]] --;
+        // update the history table, divide all entries by 2 when an entry exceeds 100,000,000
+        internal static void updateHistory(int depth, int ply, int move) {
+            Search.historyTable[(ply & 1), move] += depth;
+            if (Search.historyTable[(ply & 1), move] >= 100000000) {
+                for (int i = 0; i < 49; i++) {
+                    Search.historyTable[(ply & 1), i] /= 2;
+                }
             }
-        }*/
+        }
 
         internal class movePicker {
             internal Position board;
@@ -148,7 +149,7 @@ namespace Connect4v2._0 {
                         } else if (lowestFreeInCol == Search.killerTable[ply, 1]) {
                             score += Constants.KILLER_1_SCORE;
                         }
-                        //score += Search.historyTable[ply & 1, i];
+                        score += Search.historyTable[ply & 1, lowestFreeInCol];
 
                         moveList[numberOfMoves] = new Move(lowestFreeInCol, score);
                         numberOfMoves++;
