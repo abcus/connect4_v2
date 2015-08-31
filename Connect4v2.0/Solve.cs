@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Connect4v2._0 {
-    static class Search {
+    static class Solve {
 
         internal static TTable TranspositionTable = new TTable();
         internal static UInt64 nodesVisited = 0;
@@ -16,7 +16,7 @@ namespace Connect4v2._0 {
         internal static int[,] killerTable = new int[Constants.MAX_DEPTH, 2];
         internal static int[,] historyTable = new int[2, 49];
        
-        public static int search(int nodeType, Position inputBoard, int ply, int alpha, int beta, int depth) {
+        public static int solve(int nodeType, Position inputBoard, int ply, int alpha, int beta, int depth) {
             
             // return score for terminal state
             if (inputBoard.HasWon(inputBoard.arrayOfBitboard[(inputBoard.nPlies - 1) & 1])) {
@@ -27,7 +27,7 @@ namespace Connect4v2._0 {
             }
 
             // probe transposition table
-            TTEntry entry = Search.TranspositionTable.probeTTable(inputBoard.key);
+            TTEntry entry = Solve.TranspositionTable.probeTTable(inputBoard.key);
 
             // If entry has a flag type, then key will match (probe function performs check), only empty entries will have a key that doesn't match
             if (entry.flag == Constants.EXACT
@@ -60,14 +60,14 @@ namespace Connect4v2._0 {
                 }
                 
                 inputBoard.MakeMove(move);
-                int score = -search(Constants.NON_ROOT, inputBoard, ply + 1, -beta, -alpha, depth - 1);
+                int score = -solve(Constants.NON_ROOT, inputBoard, ply + 1, -beta, -alpha, depth - 1);
                 inputBoard.UnmakeMove();
                 nodesVisited++;
                 movesMade++;
 
                 if (score >= beta) {
                     TTEntry newEntry = new TTEntry(inputBoard.key, Constants.L_BOUND, depth, score, move);
-                    Search.TranspositionTable.storeTTable(inputBoard.key, newEntry);
+                    Solve.TranspositionTable.storeTTable(inputBoard.key, newEntry);
                     updateKillers(move, ply);
                     updateHistory(depth, ply, move);
 
@@ -92,10 +92,10 @@ namespace Connect4v2._0 {
             // Store in transposition table
             if (raisedAlpha) {
                 TTEntry newEntry = new TTEntry(inputBoard.key, Constants.EXACT, depth, alpha, bestMove);
-                Search.TranspositionTable.storeTTable(inputBoard.key, newEntry);
+                Solve.TranspositionTable.storeTTable(inputBoard.key, newEntry);
             } else {
                 TTEntry newEntry = new TTEntry(inputBoard.key, Constants.U_BOUND, depth, bestScore, Constants.NO_MOVE); // no best move
-                Search.TranspositionTable.storeTTable(inputBoard.key, newEntry);
+                Solve.TranspositionTable.storeTTable(inputBoard.key, newEntry);
             }
             return bestScore;
         }
@@ -103,18 +103,18 @@ namespace Connect4v2._0 {
         // update the killer table
         internal static void updateKillers(int move, int ply) {
             Debug.Assert(move >= 0 && move <= 47);
-            if (move != Search.killerTable[ply, 0] && move != Constants.NO_MOVE) {
-                Search.killerTable[ply, 1] = Search.killerTable[ply, 0];
-                Search.killerTable[ply, 0] = move;
+            if (move != Solve.killerTable[ply, 0] && move != Constants.NO_MOVE) {
+                Solve.killerTable[ply, 1] = Solve.killerTable[ply, 0];
+                Solve.killerTable[ply, 0] = move;
             }
         }
 
         // update the history table, divide all entries by 2 when an entry exceeds 100,000,000
         internal static void updateHistory(int depth, int ply, int move) {
-            Search.historyTable[(ply & 1), move] += depth;
-            if (Search.historyTable[(ply & 1), move] >= 100000000) {
+            Solve.historyTable[(ply & 1), move] += depth;
+            if (Solve.historyTable[(ply & 1), move] >= 100000000) {
                 for (int i = 0; i < 49; i++) {
-                    Search.historyTable[(ply & 1), i] /= 2;
+                    Solve.historyTable[(ply & 1), i] /= 2;
                 }
             }
         }
@@ -144,12 +144,12 @@ namespace Connect4v2._0 {
                         if (hashMove != Constants.NO_MOVE && lowestFreeInCol == hashMove) {
                             score += Constants.HASH_MOVE_SCORE;
                         } 
-                        if (lowestFreeInCol == Search.killerTable[ply, 0]) {
+                        if (lowestFreeInCol == Solve.killerTable[ply, 0]) {
                             score += Constants.KILLER_0_SCORE;
-                        } else if (lowestFreeInCol == Search.killerTable[ply, 1]) {
+                        } else if (lowestFreeInCol == Solve.killerTable[ply, 1]) {
                             score += Constants.KILLER_1_SCORE;
                         }
-                        score += Search.historyTable[ply & 1, lowestFreeInCol];
+                        score += Solve.historyTable[ply & 1, lowestFreeInCol];
 
                         moveList[numberOfMoves] = new Move(lowestFreeInCol, score);
                         numberOfMoves++;

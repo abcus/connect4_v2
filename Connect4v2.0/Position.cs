@@ -57,7 +57,7 @@ namespace Connect4v2._0 {
             return nPlies == 42; 
         }
 
-        // returns whether there is a 4-in-a-row
+        // returns whether there is a 4-in-a-row (copied shamelessly from John Tromp's Fhourstones program)
         public bool HasWon(UInt64 inputBoard) {
             // checks diagonal \
             UInt64 temp = inputBoard & (inputBoard >> Constants.HEIGHT);

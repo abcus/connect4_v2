@@ -69,7 +69,7 @@ namespace Connect4v2._0 {
             }
             for (int i = 0; i < Constants.MAX_DEPTH; i++) {
                 for (int j = 0; j < 2; j++) {
-                    Search.killerTable[i, j] = -1;
+                    Solve.killerTable[i, j] = -1;
                 }
             }
         }
