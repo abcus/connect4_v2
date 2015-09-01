@@ -50,6 +50,7 @@ namespace Connect4v2._0 {
             }
             Console.WriteLine("└───┴───┴───┴───┴───┴───┴───┘");
             Console.WriteLine("  1   2   3   4   5   6   7");
+            Console.WriteLine("");
             Console.WriteLine("Key: " + inputBoard.key);
             Console.WriteLine("");
         }

@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Position.cs" />
-    <Compile Include="Search.cs" />
+    <Compile Include="Solve.cs" />
     <Compile Include="TTable.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Program.cs" />

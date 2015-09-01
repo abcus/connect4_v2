@@ -25,6 +25,7 @@ namespace Connect4v2._0 {
             for (int i = 0; i < 7; i++) {
                 height[i] = 7*i;
             }
+            Console.Write("Enter position to solve: ");
             String inputString = Console.ReadLine();
             if (inputString != "") {
                 foreach (char c in inputString) {
