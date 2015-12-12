@@ -11,7 +11,6 @@ namespace Connect4v2._0 {
 
         internal static TTable TranspositionTable = new TTable();
         internal static UInt64 nodesVisited = 0;
-        internal static int PVMove = Constants.NO_MOVE;
         internal static double fh1 = 0, fh = 0;
         internal static int[,] killerTable = new int[Constants.MAX_DEPTH, 2];
         internal static int[,] historyTable = new int[2, 49];
@@ -21,10 +20,19 @@ namespace Connect4v2._0 {
             // return score for terminal state
             if (inputBoard.HasWon(inputBoard.arrayOfBitboard[(inputBoard.nPlies - 1) & 1])) {
                 return -Constants.WIN + ply;
-            } else if (inputBoard.BoardFull()) {
+            } else if (inputBoard.nPlies == 42) {
                 Debug.Assert(depth == 0);
                 return Constants.DRAW;
             }
+
+            // "Mate" distance pruning
+            //if (nodeType != Constants.ROOT) {
+                alpha = Math.Max(ply-Constants.WIN, alpha);
+                beta = Math.Min(Constants.WIN - (ply + 1), beta);
+                if (alpha >= beta) {
+                    return alpha;
+                }
+            //}
 
             // probe transposition table
             TTEntry entry = Solve.TranspositionTable.probeTTable(inputBoard.key);
@@ -83,9 +91,6 @@ namespace Connect4v2._0 {
                     if (score > alpha) {
                         alpha = score;
                         raisedAlpha = true;
-                        if (nodeType == Constants.ROOT) {
-                            PVMove = move;
-                        }
                     }
                 }   
             }

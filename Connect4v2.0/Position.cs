@@ -17,7 +17,7 @@ namespace Connect4v2._0 {
         internal UInt64 key = 0x1UL;
 
         // Constructor
-        public Position() {
+        public Position(String inputString) {
             nPlies = 0;
             arrayOfBitboard = new UInt64[2];
             moveHistory = new int[42];
@@ -25,15 +25,13 @@ namespace Connect4v2._0 {
             for (int i = 0; i < 7; i++) {
                 height[i] = 7*i;
             }
-            Console.Write("Enter position to solve: ");
-            String inputString = Console.ReadLine();
-            if (inputString != "") {
+            if (inputString != "") { // if something other than "ENTER" was typed in
                 foreach (char c in inputString) {
                     this.MakeMove(this.height[c - '1']);
                 }
             }
         }
-
+        
         // make move (input is square index that piece ends up in)
         public void MakeMove(int move) {
             moveHistory[nPlies] = move;
@@ -51,11 +49,6 @@ namespace Connect4v2._0 {
             key ^= Constants.pieceZobrist[nPlies & 1, lastMove];
             arrayOfBitboard[nPlies & 1] ^= 0x1UL << lastMove;
             moveHistory[nPlies] = 0;
-        }
-
-        // returns whether the game board's 42 squares are full
-        public bool BoardFull() {
-            return nPlies == 42; 
         }
 
         // returns whether there is a 4-in-a-row (copied shamelessly from John Tromp's Fhourstones program)

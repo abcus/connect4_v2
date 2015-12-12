@@ -74,39 +74,40 @@ namespace Connect4v2._0 {
                 }
             }
         }
-        /*
+        
         public static void PerftTest() {
             for (int i = 1; i < 14; i++) {
-                Position test = new Position();
+                Position test = new Position("");
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                long nodeCount = Constants.perft(i, test);
-                Console.Write(i + "\t\t" + nodeCount + "\t\t");
+                UInt64 nodeCount = Constants.perft(i, test);
                 stopwatch.Stop();
-                Console.WriteLine(stopwatch.ElapsedMilliseconds + "\t\t" + nodeCount/(stopwatch.ElapsedMilliseconds+1)*1000);
+                Console.WriteLine("Depth: " + i + "\t\tNodes: " + nodeCount.ToString("#,##0") + "\t\tTime: " + stopwatch.ElapsedMilliseconds.ToString("#,##0") + "\t\tNPS: " + (nodeCount/((UInt64)stopwatch.ElapsedMilliseconds+1)*1000).ToString("#,##0"));
             }   
         }
 
-        public static long perft(int depth, Position inputBoard) {
-            long nodes = 0;
-            if (inputBoard.GameStatus() != Constants.GAMENOTOVER) {
+        public static UInt64 perft(int depth, Position inputBoard) {
+            UInt64 nodes = 0;
+            if (inputBoard.HasWon(inputBoard.arrayOfBitboard[(inputBoard.nPlies-1) & 1]) || inputBoard.nPlies == 42) {
                 return 1;
             } else if (depth == 1) {
                 for (int i = 0; i < 7; i++) {
-                    if (inputBoard.ColPlayable(i)) {
+                    if (inputBoard.height[i] - 7 * i <= 5) {
                         nodes++;
                     }
                 }
-            } else {
-                for (int i = 0; i < 7; i++) {
-                    if (inputBoard.ColPlayable(i)) {
-                        inputBoard.MakeMove(i);
-                        nodes += perft(depth - 1, inputBoard);
-                        inputBoard.UnmakeMove();
-                    }
+                return nodes;
+            }
+
+            for (int i = 0; i < 7; i++) {
+                if (inputBoard.height[i] - 7 * i <= 5) {
+                    inputBoard.MakeMove(inputBoard.height[i]);
+                    nodes += perft(depth - 1, inputBoard);
+                    inputBoard.UnmakeMove();
                 }
             }
+
             return nodes;
-        }*/
+        }
     }
 }
