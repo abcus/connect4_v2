@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Connect4v2._0 {
     static class Constants {
@@ -98,7 +91,6 @@ namespace Connect4v2._0 {
                 }
                 return nodes;
             }
-
             for (int i = 0; i < 7; i++) {
                 if (inputBoard.height[i] - 7 * i <= 5) {
                     inputBoard.MakeMove(inputBoard.height[i]);
@@ -106,7 +98,6 @@ namespace Connect4v2._0 {
                     inputBoard.UnmakeMove();
                 }
             }
-
             return nodes;
         }
     }

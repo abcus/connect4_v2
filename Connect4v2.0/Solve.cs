@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Connect4v2._0 {
     static class Solve {
@@ -26,19 +21,17 @@ namespace Connect4v2._0 {
             }
 
             // "Mate" distance pruning
-            //if (nodeType != Constants.ROOT) {
-                alpha = Math.Max(ply-Constants.WIN, alpha);
-                beta = Math.Min(Constants.WIN - (ply + 1), beta);
-                if (alpha >= beta) {
-                    return alpha;
-                }
-            //}
-
+            alpha = Math.Max(ply-Constants.WIN, alpha);
+            beta = Math.Min(Constants.WIN - (ply + 1), beta);
+            if (alpha >= beta) {
+                return alpha;
+            }
+            
             // probe transposition table
             TTEntry entry = Solve.TranspositionTable.probeTTable(inputBoard.key);
 
             // If entry has a flag type, then key will match (probe function performs check), only empty entries will have a key that doesn't match
-            if (entry.flag == Constants.EXACT
+            if (entry.flag == Constants.EXACT 
                 || entry.flag == Constants.L_BOUND && entry.evaluationScore >= beta
                 || entry.flag == Constants.U_BOUND && entry.evaluationScore <= alpha) {
                 Debug.Assert(entry.key == inputBoard.key && entry.depth == depth);
@@ -55,14 +48,15 @@ namespace Connect4v2._0 {
             int hashMove = (entry.flag == Constants.L_BOUND && entry.evaluationScore < beta) ? entry.move : Constants.NO_MOVE;
             int bestScore = -Constants.INF;
             int movesMade = 0;
+            int numberOfMoves = 0, moveIndex = 0;
             bool raisedAlpha = false;
-            movePicker mPicker = new movePicker(inputBoard, ply, hashMove);
+            Move[] moveList = moveGenerator(ply, hashMove, ref numberOfMoves, inputBoard);
             int bestMove = Constants.NO_MOVE;
 
             // loop through all moves
             while (true) {
-                int move = mPicker.getNextMove();
-                
+                int move = getNextMove(numberOfMoves, ref moveIndex, moveList);
+
                 if (move == Constants.NO_MOVE) {
                     break;
                 }
@@ -123,69 +117,55 @@ namespace Connect4v2._0 {
                 }
             }
         }
+        
+        // generates array of moves
+        internal static Move[] moveGenerator(int ply, int hashMove, ref int numberOfMoves, Position inputBoard) {
+            Move[] moveList = new Move[7];
 
-        internal class movePicker {
-            internal Position board;
-            internal int ply;
-            internal Move[] moveList;
-            internal int moveIndex = 0;
-            internal int numberOfMoves = 0;
-            internal int hashMove = Constants.NO_MOVE;
+            for (int i = 0; i < 7; i++) {
+                int lowestFreeInCol = inputBoard.height[i];
+                if (lowestFreeInCol - 7 * i <= 5) {
+                    int score = (Constants.CENTRAL_COLUMN_SCORE - Constants.DISTANCE_PENALTY * Math.Abs(i - 3));
+                    if (hashMove != Constants.NO_MOVE && lowestFreeInCol == hashMove) {
+                        score += Constants.HASH_MOVE_SCORE;
+                    }
+                    if (lowestFreeInCol == Solve.killerTable[ply, 0]) {
+                        score += Constants.KILLER_0_SCORE;
+                    }
+                    else if (lowestFreeInCol == Solve.killerTable[ply, 1]) {
+                        score += Constants.KILLER_1_SCORE;
+                    }
+                    score += Solve.historyTable[ply & 1, lowestFreeInCol];
 
-            public movePicker(Position inputBoard, int ply, int hashMove) {
-                board = inputBoard;
-                this.ply = ply;
-                this.hashMove = hashMove;
-                moveList = this.moveGenerator();
+                    moveList[numberOfMoves] = new Move(lowestFreeInCol, score);
+                    numberOfMoves++;
+                }
             }
-            // generates array of moves
-            internal Move[] moveGenerator() {
-                Move[] moveList = new Move[7];
-                
-                for (int i = 0; i < 7; i++) {
-                    int lowestFreeInCol = board.height[i];
-                    if (lowestFreeInCol - 7 * i <= 5) {
-                        int score = (Constants.CENTRAL_COLUMN_SCORE - Constants.DISTANCE_PENALTY*Math.Abs(i - 3));
-                        if (hashMove != Constants.NO_MOVE && lowestFreeInCol == hashMove) {
-                            score += Constants.HASH_MOVE_SCORE;
-                        } 
-                        if (lowestFreeInCol == Solve.killerTable[ply, 0]) {
-                            score += Constants.KILLER_0_SCORE;
-                        } else if (lowestFreeInCol == Solve.killerTable[ply, 1]) {
-                            score += Constants.KILLER_1_SCORE;
-                        }
-                        score += Solve.historyTable[ply & 1, lowestFreeInCol];
+            return moveList;
+        }
 
-                        moveList[numberOfMoves] = new Move(lowestFreeInCol, score);
-                        numberOfMoves++;
+        internal static int getNextMove(int numberOfMoves, ref int moveIndex, Move[] moveList) {
+            while (moveIndex < numberOfMoves) {
+
+                int maxScore = -Constants.INF;
+                int maxPosition = -1;
+                for (int i = moveIndex; i < numberOfMoves; i++) {
+
+                    if (moveList[i].score > maxScore) {
+                        maxScore = (moveList[i].score);
+                        maxPosition = i;
                     }
                 }
-                return moveList;
+                Move moveTemp = moveList[moveIndex];
+                moveList[moveIndex] = moveList[maxPosition];
+                moveList[maxPosition] = moveTemp;
+
+                int move = (moveList[moveIndex].move);
+
+                moveIndex++;
+                return move;
             }
-
-            internal int getNextMove() {
-                while (moveIndex < numberOfMoves) {
-
-                    int maxScore = -Constants.INF;
-                    int maxPosition = -1;
-                    for (int i = moveIndex; i < numberOfMoves; i++) {
-                        
-                        if (moveList[i].score > maxScore) {
-                            maxScore = (moveList[i].score);
-                            maxPosition = i;
-                        }
-                    }
-                    Move moveTemp = moveList[moveIndex];
-                    moveList[moveIndex] = moveList[maxPosition];
-                    moveList[maxPosition] = moveTemp;
-
-                    int move = (moveList[moveIndex].move);
-                    
-                    moveIndex++;
-                    return move;   
-                }
-                return Constants.NO_MOVE;
-            }
+            return Constants.NO_MOVE;
         }
     }
 }
